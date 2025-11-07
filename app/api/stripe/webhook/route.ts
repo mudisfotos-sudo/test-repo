@@ -62,7 +62,7 @@ export async function POST(request: Request) {
           }
         });
         await prisma.user.updateMany({
-          where: { subscription: { stripeSubscriptionId: subscription.id } },
+          where: { subscription: { is: { stripeSubscriptionId: subscription.id } } },
           data: { role: "FREE" }
         });
         break;

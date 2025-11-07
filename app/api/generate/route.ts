@@ -37,9 +37,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing post ID" }, { status: 400 });
     }
     const existing = await prisma.post.findUnique({
-      where: { id: postId, userId: session.user.id }
+      where: { id: postId }
     });
-    if (!existing) {
+    if (!existing || existing.userId !== session.user.id) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
