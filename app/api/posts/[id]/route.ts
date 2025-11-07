@@ -19,8 +19,16 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   const { introduction, body: contentBody, conclusion, keywords, seo, tone, audience, length } = body;
 
   try {
+    const existing = await prisma.post.findUnique({
+      where: { id: params.id }
+    });
+
+    if (!existing || existing.userId !== session.user.id) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
     const updated = await prisma.post.update({
-      where: { id: params.id, userId: session.user.id },
+      where: { id: params.id },
       data: {
         introduction,
         body: contentBody,
@@ -47,9 +55,14 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 
   try {
-    await prisma.post.delete({
+    const deleted = await prisma.post.deleteMany({
       where: { id: params.id, userId: session.user.id }
     });
+
+    if (deleted.count === 0) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);

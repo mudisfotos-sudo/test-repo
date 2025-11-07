@@ -15,10 +15,10 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   const post = await prisma.post.findUnique({
-    where: { id: params.id, userId: session.user.id }
+    where: { id: params.id }
   });
 
-  if (!post) {
+  if (!post || post.userId !== session.user.id) {
     notFound();
   }
 
